@@ -53,35 +53,7 @@ d-i partman-auto/expert_recipe string                         \
       default ::                                              \
               1 1 1 free method{ biosgrub }                   \
               .                                               \
-              50000 100000 60000 ext3                         \
-                      $primary{ } $bootable{ }                \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ / }                         \
-                      options/noatime{ noatime }              \
-                      options/nodiratime{ nodiratime }        \
-              .                                               \
-              1024 1000 1024 linux-swap                       \
-                      method{ swap } format{ }                \
-              .                                               \
-              50000 20000 60000 ext3                          \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ ext4 }    \
-                      mountpoint{ /var/log }                  \
-                      options/noatime{ noatime }              \
-                      options/nodiratime{ nodiratime }        \
-              .                                               \
-              50000 10000 -1 ext3                             \
-                      method{ format } format{ }              \
-                      use_filesystem{ } filesystem{ xfs }     \
-                      mountpoint{ /mnt/disk1_data }           \
-                      options/noatime{ noatime }              \
-                      options/nodiratime{ nodiratime }        \
-              .\
-      noextradata ::                                          \
-              1 1 1 free method{ biosgrub }                   \
-              .                                               \
-              50000 50060 -1 ext3                             \
+              30000 30060 60000 ext3                          \
                       $primary{ } $bootable{ }                \
                       method{ format } format{ }              \
                       use_filesystem{ } filesystem{ ext4 }    \
@@ -92,7 +64,35 @@ d-i partman-auto/expert_recipe string                         \
               1024 1034 1024 linux-swap                       \
                       method{ swap } format{ }                \
               .                                               \
-              50000 50030 60000 ext3                          \
+              30000 30020 60000 ext3                          \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /var/log }                  \
+                      options/noatime{ noatime }              \
+                      options/nodiratime{ nodiratime }        \
+              .                                               \
+              30000 30020 -1 ext3                             \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ xfs }     \
+                      mountpoint{ /mnt/disk1_data }           \
+                      options/noatime{ noatime }              \
+                      options/nodiratime{ nodiratime }        \
+              .\
+      noextradata ::                                          \
+              1 1 1 free method{ biosgrub }                   \
+              .                                               \
+              30000 30060 -1 ext3                             \
+                      $primary{ } $bootable{ }                \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+                      options/noatime{ noatime }              \
+                      options/nodiratime{ nodiratime }        \
+              .                                               \
+              1024 1034 1024 linux-swap                       \
+                      method{ swap } format{ }                \
+              .                                               \
+              30000 30030 60000 ext3                          \
                       method{ format } format{ }              \
                       use_filesystem{ } filesystem{ ext4 }    \
                       mountpoint{ /var/log }                  \
