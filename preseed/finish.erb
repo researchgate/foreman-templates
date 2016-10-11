@@ -85,8 +85,8 @@ echo "wget -P /tmp http://packages.<%= @host.domain -%>/repos/trusty/megacli_${m
 echo "dpkg -i /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
 echo "rm /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
 echo "wget -r --no-parent -P /tmp/bootstrap http://packages.<%= @host.domain -%>/scripts/bootstrap/" >> /etc/rc.local
-echo "cp /tmp/bootstrap/packages.rgcloud.net/scripts/bootstrap/rg-bootstrap.sh /root/" >> /etc/rc.local
-echo "pushd /tmp/bootstrap/packages.rgcloud.net/scripts/" >> /etc/rc.local
+echo "cp /tmp/bootstrap/packages.<%= @host.domain -%>/scripts/bootstrap/rg-bootstrap.sh /root/" >> /etc/rc.local
+echo "pushd /tmp/bootstrap/packages.<%= @host.domain -%>/scripts/" >> /etc/rc.local
 echo "python -m bootstrap >> /bootstrap.log 2>&1" >> /etc/rc.local
 echo "popd" >> /etc/rc.local
 echo "rm -rf /tmp/bootstrap" >> /etc/rc.local
