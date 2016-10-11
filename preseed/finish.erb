@@ -1,0 +1,97 @@
+<%#
+kind: finish
+name: Preseed default finish
+oses:
+- Debian
+- Ubuntu
+%>
+<%
+  # safemode renderer does not support unary negation
+  pm_set = @host.puppetmaster.empty? ? false : true
+  puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
+  salt_enabled = @host.params['salt_master'] ? true : false
+  chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
+%>
+
+<% subnet = @host.subnet -%>
+<% if subnet.respond_to?(:dhcp_boot_mode?) -%>
+  <% dhcp = subnet.dhcp_boot_mode? && !@static -%>
+<% else -%>
+  <% dhcp = !@static -%>
+<% end -%>
+<% unless dhcp -%>
+# host and domain name need setting as these values may have come from dhcp if pxe booting
+/bin/sed -i "s/^search.*$/search <%= @host.domain %>/g" /etc/resolv.conf
+/bin/sed -i "s/.*dns-search.*/\tdns-search <%= @host.domain %>/g" /etc/network/interfaces
+/bin/sed -i "s/^<%= @host.ip %>.*/<%= @host.ip %>\t<%= @host.shortname %>.<%= @host.domain %>\t<%= @host.shortname %>/g" /etc/hosts
+/bin/echo "<%= @host.shortname %>.<%= @host.domain %>" > /etc/hostname
+<% end -%>
+<% if puppet_enabled %>
+cat > /etc/puppet/puppet.conf << EOF
+<%= snippet 'puppet.conf' %>
+EOF
+if [ -f "/etc/default/puppet" ]
+then
+/bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
+fi
+/bin/touch /etc/puppet/namespaceauth.conf
+/usr/bin/puppet agent --enable
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+<% end -%>
+
+<% if @host.info['parameters']['realm'] && @host.otp && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
+<%= snippet 'freeipa_register' %>
+<% end -%>
+
+<% if salt_enabled %>
+cat > /etc/salt/minion << EOF
+<%= snippet 'saltstack_minion' %>
+EOF
+# Running salt-call to trigger key signing
+salt-call --no-color --grains >/dev/null
+<% end -%>
+
+<% if chef_enabled %>
+<%= respond_to?(:chef_bootstrap) ? chef_bootstrap(@host) : snippet_if_exists("chef-client omnibus bootstrap") %>
+<% end%>
+
+# RG STUFF
+## resolv.conf
+cat << _EOF > /etc/resolvconf/resolv.conf.d/base
+domain <%= @host.domain %>
+<%= [subnet.dns_primary,subnet.dns_secondary].reject{|n| n.blank?}.each |dns_server| %>
+nameserver <%= dns_server %>
+<% end -%>
+options rotate
+options timeout:1
+_EOF
+
+## allow root login
+sed -i "s/^PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
+
+## bind home and opt to data disk
+mkdir -p /mnt/disk1_data/home
+echo '/mnt/disk1_data/home  /home none bind,nofail 0 0' >> /etc/fstab
+mkdir /mnt/disk1_data/opt
+echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
+
+## prepare boostrap tool
+# set megacli version
+megacli_version='8.07.14-1_amd64'
+mv /etc/rc.local /etc/rc.local.bak
+echo "#!/bin/bash" >> /etc/rc.local
+echo "ifconfig eth0 up" >> /etc/rc.local
+echo "wget -P /tmp http://packages.<%= @host.domain -%>/repos/trusty/megacli_${megacli_version}.deb" >> /etc/rc.local
+echo "dpkg -i /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
+echo "rm /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
+echo "wget -r --no-parent -P /tmp/bootstrap http://packages.<%= @host.domain -%>/scripts/bootstrap/" >> /etc/rc.local
+echo "cp /tmp/bootstrap/packages.rgcloud.net/scripts/bootstrap/rg-bootstrap.sh /root/" >> /etc/rc.local
+echo "pushd /tmp/bootstrap/packages.rgcloud.net/scripts/" >> /etc/rc.local
+echo "python -m bootstrap >> /bootstrap.log 2>&1" >> /etc/rc.local
+echo "popd" >> /etc/rc.local
+echo "rm -rf /tmp/bootstrap" >> /etc/rc.local
+echo "mv /etc/rc.local.bak /etc/rc.local" >> /etc/rc.local
+chmod +x /etc/rc.local
+
+# Send finish to foreman
+/usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url %>
