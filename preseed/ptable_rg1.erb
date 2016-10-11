@@ -50,7 +50,7 @@ d-i partman-auto-lvm/new_vg_name string <%= vg_name %>
 d-i partman-auto/choose_recipe select <%= partitioning_recipe %>
 
 d-i partman-auto/expert_recipe string                         \
-      boot-root ::                                            \
+      default ::                                              \
               1 1 1 free method{ biosgrub }                   \
               .                                               \
               50000 100000 60000 ext3                         \
@@ -74,7 +74,28 @@ d-i partman-auto/expert_recipe string                         \
               50000 10000 -1 ext3                             \
                       method{ format } format{ }              \
                       use_filesystem{ } filesystem{ xfs }     \
-                      mountpoint{ /mnt/disk1_data }             \
+                      mountpoint{ /mnt/disk1_data }           \
+                      options/noatime{ noatime }              \
+                      options/nodiratime{ nodiratime }        \
+              .\
+      noextradata ::                                          \
+              1 1 1 free method{ biosgrub }                   \
+              .                                               \
+              50000 50060 -1 ext3                             \
+                      $primary{ } $bootable{ }                \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ / }                         \
+                      options/noatime{ noatime }              \
+                      options/nodiratime{ nodiratime }        \
+              .                                               \
+              1024 1034 1024 linux-swap                       \
+                      method{ swap } format{ }                \
+              .                                               \
+              50000 50030 60000 ext3                          \
+                      method{ format } format{ }              \
+                      use_filesystem{ } filesystem{ ext4 }    \
+                      mountpoint{ /var/log }                  \
                       options/noatime{ noatime }              \
                       options/nodiratime{ nodiratime }        \
               .
