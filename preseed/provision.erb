@@ -11,7 +11,7 @@ oses:
   proxy_string = @host.params['http-proxy'] ? " http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
   salt_enabled = @host.params['salt_master'] ? true : false
-  aptly_host = @host.params['aptly_host'].empty? ? "aptly.#{@domain}" : @host.params['aptly_host']
+  aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
 %>
 # Locale
 d-i debian-installer/locale string <%= @host.params['lang'] || 'en_US' %>

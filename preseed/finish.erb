@@ -36,7 +36,7 @@ then
 fi
 /bin/touch /etc/puppet/namespaceauth.conf
 /usr/bin/puppet agent --enable
-/usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
 <% end -%>
 
 <% if @host.info['parameters']['realm'] && @host.otp && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
@@ -59,7 +59,7 @@ salt-call --no-color --grains >/dev/null
 ## resolv.conf
 cat << _EOF > /etc/resolvconf/resolv.conf.d/base
 domain <%= @host.domain %>
-<%= [subnet.dns_primary,subnet.dns_secondary].reject{|n| n.blank?}.each |dns_server| %>
+<% [subnet.dns_primary,subnet.dns_secondary].reject{|n| n.blank?}.each do |dns_server| -%>
 nameserver <%= dns_server %>
 <% end -%>
 options rotate
