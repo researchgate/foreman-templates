@@ -79,10 +79,9 @@ d-i partman-auto/expert_recipe string                         \
                       options/nodiratime{ nodiratime }        \
               .
 
-
+<% if partitioning_filesystem != '' -%>
 # If you just want to change the default filesystem to something
 # else, you can do that without providing a full recipe.
-<% if partitioning_filesystem != '' -%>
 d-i partman/default_filesystem string <%= partitioning_filesystem %>
 <% end -%>
 
