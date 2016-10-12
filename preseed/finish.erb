@@ -27,8 +27,6 @@ oses:
 /bin/sed -i "s/.*dns-search.*/\tdns-search <%= @host.domain %>/g" /etc/network/interfaces
 /bin/sed -i "s/^<%= @host.ip %>.*/<%= @host.ip %>\t<%= @host.shortname %>.<%= @host.domain %>\t<%= @host.shortname %>/g" /etc/hosts
 <% end -%>
-# add fqdn as hostname
-/bin/echo "<%= @host.shortname %>.<%= @host.domain %>" > /etc/hostname
 <% if puppet_enabled %>
 cat > /etc/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
@@ -59,6 +57,8 @@ salt-call --no-color --grains >/dev/null
 <% end%>
 
 # RG STUFF
+# add fqdn as hostname
+/bin/echo "<%= @host.shortname %>.<%= @host.domain %>" > /etc/hostname
 ## resolv.conf
 cat << _EOF > /etc/resolvconf/resolv.conf.d/base
 domain <%= @host.domain %>
