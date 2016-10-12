@@ -11,6 +11,8 @@ oses:
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
   salt_enabled = @host.params['salt_master'] ? true : false
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
+  burnin_enabled = @host.params['burn-in'] ? @host.params['burn-in'] : true
+  packages_host = @host.params['packages_host'] ? : @host.params['packages_host'] : "packages.#{@host.domain}"
 %>
 
 <% subnet = @host.subnet -%>
@@ -69,29 +71,17 @@ _EOF
 ## allow root login
 sed -i "s/^PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
 
-## bind home and opt to data disk
+## bind home and opt to data disk partition
 mkdir -p /mnt/disk1_data/home
 echo '/mnt/disk1_data/home  /home none bind,nofail 0 0' >> /etc/fstab
 mkdir /mnt/disk1_data/opt
 echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 
+<% if burnin_enabled -%>
 ## prepare boostrap tool
-# set megacli version
-megacli_version='8.07.14-1_amd64'
-mv /etc/rc.local /etc/rc.local.bak
-echo "#!/bin/bash" >> /etc/rc.local
-echo "ifconfig eth0 up" >> /etc/rc.local
-echo "wget -P /tmp http://packages.<%= @host.domain -%>/repos/trusty/megacli_${megacli_version}.deb" >> /etc/rc.local
-echo "dpkg -i /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
-echo "rm /tmp/megacli_${megacli_version}.deb" >> /etc/rc.local
-echo "wget -r --no-parent -P /tmp/bootstrap http://packages.<%= @host.domain -%>/scripts/bootstrap/" >> /etc/rc.local
-echo "cp /tmp/bootstrap/packages.<%= @host.domain -%>/scripts/bootstrap/rg-bootstrap.sh /root/" >> /etc/rc.local
-echo "pushd /tmp/bootstrap/packages.<%= @host.domain -%>/scripts/" >> /etc/rc.local
-echo "python -m bootstrap >> /bootstrap.log 2>&1" >> /etc/rc.local
-echo "popd" >> /etc/rc.local
-echo "rm -rf /tmp/bootstrap" >> /etc/rc.local
-echo "mv /etc/rc.local.bak /etc/rc.local" >> /etc/rc.local
-chmod +x /etc/rc.local
+wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
+bash /tmp/rg-burnin.sh <%= packages_host %>
+<% end -%>
 
 # Send finish to foreman
 /usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url %>
