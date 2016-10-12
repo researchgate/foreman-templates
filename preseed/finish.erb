@@ -12,7 +12,7 @@ oses:
   salt_enabled = @host.params['salt_master'] ? true : false
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
   burnin_enabled = @host.params['burn-in'] ? @host.params['burn-in'] : true
-  packages_host = @host.params['packages_host'] ? : @host.params['packages_host'] : "packages.#{@host.domain}"
+  packages_host = @host.params['packages_host'] ? @host.params['packages_host'] : "packages.#{@host.domain}"
 %>
 
 <% subnet = @host.subnet -%>
