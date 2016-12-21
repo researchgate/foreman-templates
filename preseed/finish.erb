@@ -60,7 +60,7 @@ salt-call --no-color --grains >/dev/null
 # add fqdn as hostname
 /bin/echo "<%= @host.shortname %>.<%= @host.domain %>" > /etc/hostname
 ## resolv.conf
-cat << _EOF > /etc/resolvconf/resolv.conf.d/base
+cat << _EOF > /etc/resolvconf/resolv.conf.d/head
 domain <%= @host.domain %>
 <% [subnet.dns_primary,subnet.dns_secondary].reject{|n| n.blank?}.each do |dns_server| -%>
 nameserver <%= dns_server %>
