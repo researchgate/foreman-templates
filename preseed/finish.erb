@@ -81,7 +81,8 @@ echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 <% if burnin_enabled -%>
 ## prepare boostrap tool
 wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
-bash /tmp/rg-burnin.sh <%= packages_host %>
+echo "running rg-burnin.sh" >> /bootstrap.log 2>&1
+bash /tmp/rg-burnin.sh <%= packages_host %> >> /bootstrap.log 2>&1
 <% end -%>
 
 # Send finish to foreman
