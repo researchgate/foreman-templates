@@ -19,6 +19,9 @@ oses:
   if @host.params['blacklist']
     options << @host.params['blacklist'].split(',').collect{|x| "#{x.strip}.blacklist=yes"}.join(' ')
   end
+  netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
+  options << "interface=#{netcfg_choose_interface}"
+  options << "hostname=#{@host.name}"
   if @host.operatingsystem.name == 'Debian'
     options << "auto=true"
     options << "domain=#{@host.domain}"
@@ -35,5 +38,5 @@ DEFAULT linux
 
 LABEL linux
     KERNEL <%= @kernel %>
-    APPEND initrd=<%= @initrd %> interface=auto url=<%= foreman_url('provision')%> ramdisk_size=10800 root=/dev/rd/0 rw auto hostname=<%= @host.name %> <%= options %>
+    APPEND initrd=<%= @initrd %> url=<%= foreman_url('provision')%> ramdisk_size=10800 root=/dev/rd/0 rw auto <%= options %>
     IPAPPEND 2
