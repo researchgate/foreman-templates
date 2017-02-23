@@ -12,6 +12,7 @@ oses:
   puppet_enabled = false if @host.param_true?('disable-puppet')
   proxy_string = @host.params['http-proxy'] ? " http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
   aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
+  netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
 %>
 # Locale
 d-i debian-installer/locale string <%= @host.params['lang'] || 'en_US' %>
@@ -39,7 +40,7 @@ d-i netcfg/confirm_static boolean true
 <% end -%>
 
 # Network configuration
-d-i netcfg/choose_interface select auto
+d-i netcfg/choose_interface select <%= netcfg_choose_interface %>
 d-i netcfg/get_hostname string <%= @host %>
 d-i netcfg/get_domain string <%= @host.domain %>
 d-i netcfg/wireless_wep string
