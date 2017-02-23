@@ -30,6 +30,7 @@ oses:
 <% if puppet_enabled %>
 cat > /etc/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
+stringify_facts = false
 EOF
 if [ -f "/etc/default/puppet" ]
 then
