@@ -82,6 +82,7 @@ echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 ## prepare bootstrap and burn-in tool
 wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
 echo "running rg-burnin.sh" >> /bootstrap.log 2>&1
+bash /tmp/rg-burnin.sh <%= packages_host %> <%= burnin_enabled -%> >> /bootstrap.log 2>&1
 
 # Send finish to foreman
 /usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url %>
