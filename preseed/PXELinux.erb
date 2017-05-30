@@ -29,6 +29,7 @@ oses:
     options << 'console-setup/ask_detect=false console-setup/layout=USA console-setup/variant=USA keyboard-configuration/layoutcode=us localechooser/translation/warn-light=true localechooser/translation/warn-severe=true'
   end
   options << "locale=#{@host.params['lang'] || 'en_US'}"
+  options << 'net.ifnames=0'
   options << 'biosdevname=0'
   options << 'usbcore.autosuspend=-1'
   options = options.join(' ')
