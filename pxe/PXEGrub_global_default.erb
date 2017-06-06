@@ -1,0 +1,15 @@
+<%#
+kind: PXEGrub
+name: PXEGrub global default
+%>
+<%# Used to boot unknown hosts, do not associate or change the name. %>
+
+default=0
+timeout=20
+
+<%= snippet "pxegrub_chainload" %>
+
+<%= snippet "pxegrub_rescue" %>
+
+<%= snippet "pxegrub_discovery" %>
+

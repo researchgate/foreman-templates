@@ -1,0 +1,9 @@
+<%#
+kind: snippet
+name: pxegrub2_rescue
+-%>
+
+menuentry 'Ubuntu Rescue Image' {
+  linux  ubuntu/ubuntu-installer/amd64/linux rescue/enable=true
+  initrd ubuntu/ubuntu-installer/amd64/initrd.gz
+}

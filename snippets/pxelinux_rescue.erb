@@ -1,0 +1,9 @@
+<%#
+kind: snippet
+name: pxelinux_rescue
+%>
+
+LABEL rescue
+   menu label ^Rescue Mode
+   kernel ubuntu/ubuntu-installer/amd64/linux
+   append vga=normal initrd=ubuntu/ubuntu-installer/amd64/initrd.gz rescue/enable=true --quiet
