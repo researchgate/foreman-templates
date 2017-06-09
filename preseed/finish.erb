@@ -79,6 +79,11 @@ echo '/mnt/disk1_data/home  /home none bind,nofail 0 0' >> /etc/fstab
 mkdir /mnt/disk1_data/opt
 echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 
+<% if @host.operatingsystem.name == 'Ubuntu' -%>
+# xenial workaround to override default options for grub to disable splash
+sed 's/GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="nosplash net.ifnames=0 biosdevname=0 usbcore.autosuspend=-1"/g' -i /etc/default/grub && update-grub
+<% end -%>
+
 ## prepare bootstrap and burn-in tool
 wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
 echo "running rg-burnin.sh" >> /bootstrap.log 2>&1
