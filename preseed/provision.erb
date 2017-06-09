@@ -13,6 +13,24 @@ oses:
   proxy_string = @host.params['http-proxy'] ? " http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
   aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
   netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
+
+  host_extra_packages = (@host.params['extra_packages'] and not @host.params['extra_packages'].empty?) ? @host.params['extra_packages'].split(',') : []
+  preseed_extra_packages = (host_extra_packages.kind_of?(Array)) ? host_extra_packages : []
+  preseed_extra_packages << "lsb-release"
+  preseed_extra_packages << "openssh-server"
+  preseed_extra_packages << "build-essential"
+  preseed_extra_packages << "puppet"
+  preseed_extra_packages << "vim"
+  preseed_extra_packages << "sed"
+  preseed_extra_packages << "xfsprogs"
+  preseed_extra_packages << "smartmontools"
+  preseed_extra_packages << "fio"
+  preseed_extra_packages << "stress"
+  preseed_extra_packages << "memtester"
+  preseed_extra_packages << "bc"
+  preseed_extra_packages << "apt-transport-https"
+  preseed_extra_packages << "megacli"
+  preseed_extra_packages = preseed_extra_packages.join(' ')
 %>
 # Locale
 d-i debian-installer/locale string <%= @host.params['lang'] || 'en_US' %>
@@ -138,7 +156,7 @@ tasksel tasksel/first multiselect minimal, ssh-server, openssh-server
 <% end -%>
 
 # Install some base packages
-d-i pkgsel/include string <%= puppet_package %> lsb-release openssh-server build-essential puppet vim sed xfsprogs smartmontools fio stress memtester bc apt-transport-https megacli
+d-i pkgsel/include string <%= puppet_package %> <%= preseed_extra_packages %>
 d-i pkgsel/update-policy select none
 d-i pkgsel/upgrade select none
 
@@ -163,4 +181,3 @@ d-i grub-installer/bootdev string default
 d-i finish-install/reboot_in_progress note
 
 d-i preseed/late_command string wget -Y off <%= @static ? "'#{foreman_url('finish')}&static=true'" : foreman_url('finish') %> -O /target/tmp/finish.sh && in-target chmod +x /tmp/finish.sh && in-target /tmp/finish.sh
-
