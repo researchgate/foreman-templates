@@ -15,7 +15,7 @@ ONTIMEOUT local
 
 <%= snippet "pxelinux_discovery" %>
 
-<%= snippet "pxelinux_rescue" %>
+<%= snippet "RG pxelinux_rescue" %>
 
 <% for profile in @profiles
   url = default_template_url(profile[:template], profile[:hostgroup])
