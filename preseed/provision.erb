@@ -14,8 +14,7 @@ oses:
   aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
   netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
 
-  host_extra_packages = (@host.params['extra_packages'] and not @host.params['extra_packages'].empty?) ? @host.params['extra_packages'].split(',') : []
-  preseed_extra_packages = (host_extra_packages.kind_of?(Array)) ? host_extra_packages : []
+  preseed_extra_packages = (@host.params['extra_packages'] and not @host.params['extra_packages'].empty?) ? @host.params['extra_packages'].split(',') : []
   preseed_extra_packages << "lsb-release"
   preseed_extra_packages << "openssh-server"
   preseed_extra_packages << "build-essential"
