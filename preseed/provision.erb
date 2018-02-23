@@ -12,7 +12,7 @@ oses:
   puppet_enabled = false if @host.param_true?('disable-puppet')
   proxy_string = @host.params['http-proxy'] ? " http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
   aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
-  netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
+  netcfg_choose_interface = (@host.provision_interface.identifier and not @host.provision_interface.identifier.empty?) ? @host.provision_interface.identifier : 'auto'
 
   preseed_extra_packages = (@host.params['extra_packages'] and not @host.params['extra_packages'].empty?) ? @host.params['extra_packages'].split(',') : []
   preseed_extra_packages << "lsb-release"

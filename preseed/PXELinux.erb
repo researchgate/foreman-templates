@@ -19,7 +19,7 @@ oses:
   if @host.params['blacklist']
     options << @host.params['blacklist'].split(',').collect{|x| "#{x.strip}.blacklist=yes"}.join(' ')
   end
-  netcfg_choose_interface = (@host.params['provision_interface'] and not @host.params['provision_interface'].empty?)? "#{@host.params['provision_interface']}" : 'auto'
+  netcfg_choose_interface = (@host.provision_interface.identifier and not @host.provision_interface.identifier.empty?) ? @host.provision_interface.identifier : 'auto'
   options << "interface=#{netcfg_choose_interface}"
   options << "hostname=#{@host.name}"
   if @host.operatingsystem.name == 'Debian'
