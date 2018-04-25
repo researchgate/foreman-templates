@@ -28,6 +28,14 @@ oses:
 /bin/sed -i "s/.*dns-search.*/\tdns-search <%= @host.domain %>/g" /etc/network/interfaces
 /bin/sed -i "s/^<%= @host.ip %>.*/<%= @host.ip %>\t<%= @host.shortname %>.<%= @host.domain %>\t<%= @host.shortname %>/g" /etc/hosts
 <% end -%>
+
+## bind home and opt to data disk partition
+mkdir -p /mnt/disk1_data/home
+echo '/mnt/disk1_data/home  /home none bind,nofail 0 0' >> /etc/fstab
+mkdir /mnt/disk1_data/opt
+echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
+/bin/mount -a
+
 <% if host_param_true?('enable-puppet4') %>
 apt-get install -y puppet-agent=1.10.12-1<%= @host.operatingsystem.release_name %>
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
@@ -90,12 +98,6 @@ _EOF
 
 ## allow root login
 sed -i "s/^PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
-
-## bind home and opt to data disk partition
-mkdir -p /mnt/disk1_data/home
-echo '/mnt/disk1_data/home  /home none bind,nofail 0 0' >> /etc/fstab
-mkdir /mnt/disk1_data/opt
-echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 
 <% if @host.operatingsystem.name == 'Ubuntu' -%>
 # xenial workaround to override default options for grub to disable splash
