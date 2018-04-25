@@ -40,7 +40,8 @@ then
 /bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
 fi
 /opt/puppetlabs/puppet/bin/puppet agent --enable
-/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log
+service puppet start
 <% else -%>
 <%  if puppet_enabled %>
 apt-get install -y puppet
@@ -54,7 +55,8 @@ then
 fi
 /bin/touch /etc/puppet/namespaceauth.conf
 /usr/bin/puppet agent --enable
-/usr/bin/puppet agent --config /etc/puppet/puppet.conf --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log
+service puppet start
 <%  end -%>
 <% end -%>
 
