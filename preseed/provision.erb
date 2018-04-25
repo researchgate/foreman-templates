@@ -10,6 +10,7 @@ oses:
   pm_set = @host.puppetmaster.empty? ? false : true
   puppet_enabled = pm_set || @host.param_true?('force-puppet')
   puppet_enabled = false if @host.param_true?('disable-puppet')
+  puppet4_enabled = @host.params['puppet4_enabled'] && @host.params['puppet4_enabled'] == 'true'
   proxy_string = @host.params['http-proxy'] ? " http://#{@host.params['http-proxy']}:#{@host.params['http-proxy-port']}" : ''
   aptly_host = (@host.params['aptly_host'] and not @host.params['aptly_host'].empty?) ? @host.params['aptly_host'] : "aptly.#{@host.domain}"
   netcfg_choose_interface = (@host.provision_interface.identifier and not @host.provision_interface.identifier.empty?) ? @host.provision_interface.identifier : 'auto'
@@ -150,7 +151,7 @@ d-i grub-installer/bootdev string <%= @host.params['install-disk'] %>
 d-i grub-installer/bootdev string default
 <% end -%>
 
-<% if @host.param_true?('puppet4_enabled') %>
+<% if puppet4_enabled %>
 <%      puppet_package = 'puppet-agent=1.10.12-1' + @host.operatingsystem.release_name -%>
 <% else -%>
 <%      puppet_package = 'puppet' -%>
