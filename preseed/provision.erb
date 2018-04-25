@@ -142,6 +142,10 @@ d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/rg-<
 d-i apt-setup/local<%= repos %>/source boolean false
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% repos += 1 -%>
+d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/puppetlabs-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
+d-i apt-setup/local<%= repos %>/source boolean false
+d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% repos += 1 -%>
 <%   end -%>
 <% end -%>
 
