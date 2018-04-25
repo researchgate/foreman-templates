@@ -30,6 +30,7 @@ oses:
 /bin/sed -i "s/^<%= @host.ip %>.*/<%= @host.ip %>\t<%= @host.shortname %>.<%= @host.domain %>\t<%= @host.shortname %>/g" /etc/hosts
 <% end -%>
 <% if puppet4_enabled %>
+apt-get install -y puppet-agent=1.10.12-1<%= @host.operatingsystem.release_name %>
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
 stringify_facts = false
@@ -42,6 +43,7 @@ fi
 /opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize
 <% else -%>
 <%  if puppet_enabled %>
+apt-get install -y puppet
 cat > /etc/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
 stringify_facts = false
