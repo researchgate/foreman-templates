@@ -9,7 +9,6 @@ oses:
   # safemode renderer does not support unary negation
   pm_set = @host.puppetmaster.empty? ? false : true
   puppet_enabled = pm_set || @host.params['force-puppet'] && @host.params['force-puppet'] == 'true'
-  puppet4_enabled = @host.params['puppet4_enabled'] && @host.params['puppet4_enabled'] == 'true'
   salt_enabled = @host.params['salt_master'] ? true : false
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
   is_physical = (@host.facts['virtual'] == 'physical') ? true : false
@@ -29,7 +28,7 @@ oses:
 /bin/sed -i "s/.*dns-search.*/\tdns-search <%= @host.domain %>/g" /etc/network/interfaces
 /bin/sed -i "s/^<%= @host.ip %>.*/<%= @host.ip %>\t<%= @host.shortname %>.<%= @host.domain %>\t<%= @host.shortname %>/g" /etc/hosts
 <% end -%>
-<% if puppet4_enabled %>
+<% if host_param_true?('enable-puppet4') %>
 apt-get install -y puppet-agent=1.10.12-1<%= @host.operatingsystem.release_name %>
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
