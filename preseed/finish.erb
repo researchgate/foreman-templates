@@ -37,7 +37,7 @@ echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 /bin/mount -a
 
 <% if host_param_true?('enable-puppet4') %>
-apt-get install -y puppet-agent=1.10.12-1<%= @host.operatingsystem.release_name %>
+apt-get install -y puppet-agent
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
 stringify_facts = false
