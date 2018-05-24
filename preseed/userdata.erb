@@ -18,7 +18,7 @@ oses:
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
 %>
 
-<% if @host.info['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
+<% if host_enc['parameters']['realm'] && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
 <%= snippet 'freeipa_register' %>
 <% end -%>
 
