@@ -14,7 +14,37 @@ oses:
   is_physical = (@host.facts['virtual'] == 'physical') ? true : false
   burnin_enabled = host_param('burn-in') ? host_param('burn-in') : is_physical
   packages_host = host_param('packages_host') ? host_param('packages_host') : "packages.#{@host.domain}"
+  aptly_host = (host_param('aptly_host') and not host_param('aptly_host').empty?) ? host_param('aptly_host') : "aptly.#{@host.domain}"
+
+  preseed_extra_packages = (host_param('extra_packages') and not host_param('extra_packages').empty?) ? host_param('extra_packages').split(',') : []
+  preseed_extra_packages << "lsb-release"
+  preseed_extra_packages << "openssh-server"
+  preseed_extra_packages << "build-essential"
+  preseed_extra_packages << "vim"
+  preseed_extra_packages << "sed"
+  preseed_extra_packages << "xfsprogs"
+  preseed_extra_packages << "smartmontools"
+  preseed_extra_packages << "fio"
+  preseed_extra_packages << "stress"
+  preseed_extra_packages << "memtester"
+  preseed_extra_packages << "bc"
+  preseed_extra_packages << "apt-transport-https"
+  preseed_extra_packages << "lshw"
+  preseed_extra_packages << "megacli"
+  preseed_extra_packages << "lvm2"
+  preseed_extra_packages = preseed_extra_packages.join(' ')
 %>
+
+exec 1>/bootstrap_finish.log
+<% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18) -%>
+# bionic installer fix for apt-keys
+apt-get install -qy --no-install-recommends gnupg2
+<%   if aptly_host -%>
+wget -q http://<%= aptly_host -%>/pubkey.pub -O- | apt-key add -
+<%   end -%>
+<% end -%>
+apt-get update
+apt-get install -qy --no-install-recommends <%= preseed_extra_packages %>
 
 <% subnet = @host.subnet -%>
 <% if subnet.respond_to?(:dhcp_boot_mode?) -%>
@@ -36,6 +66,8 @@ mkdir /mnt/disk1_data/opt
 echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 /bin/mount -a
 
+# make sure puppetlabs dir exists if we use this as parent for ssl
+mkdir -p /etc/puppetlabs/puppet
 <% if host_param_true?('enable-puppet4') %>
 apt-get install -y puppet-agent
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
@@ -47,8 +79,8 @@ then
 /bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
 fi
 /opt/puppetlabs/puppet/bin/puppet agent --enable
-/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log
-service puppet start
+/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/opt/puppetlabs/puppet/bin/puppet resource service puppet enable=true
 <% else -%>
 <%  if puppet_enabled %>
 apt-get install -y puppet
@@ -62,8 +94,8 @@ then
 fi
 /bin/touch /etc/puppet/namespaceauth.conf
 /usr/bin/puppet agent --enable
-/usr/bin/puppet agent --config /etc/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log
-service puppet start
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/usr/bin/puppet resource service puppet enable=true
 <%  end -%>
 <% end -%>
 
@@ -117,7 +149,7 @@ EOF
 ## prepare bootstrap and burn-in tool
 wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
 echo "running rg-burnin.sh" >> /bootstrap.log 2>&1
-bash /tmp/rg-burnin.sh <%= packages_host %> <%= burnin_enabled -%> >> /bootstrap.log 2>&1
+bash /tmp/rg-burnin.sh <%= packages_host %> <%= burnin_enabled -%> >> /bootstrap.log 2>&1 || /bin/true
 
 # Send finish to foreman
 /usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url('built') %>
