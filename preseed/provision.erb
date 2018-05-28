@@ -13,23 +13,6 @@ oses:
   proxy_string = host_param('http-proxy') ? " http://#{host_param('http-proxy')}:#{host_param('http-proxy-port')}" : ''
   aptly_host = (host_param('aptly_host') and not host_param('aptly_host').empty?) ? host_param('aptly_host') : "aptly.#{@host.domain}"
   netcfg_choose_interface = (@host.provision_interface.identifier and not @host.provision_interface.identifier.empty?) ? @host.provision_interface.identifier : 'auto'
-
-  preseed_extra_packages = (host_param('extra_packages') and not host_param('extra_packages').empty?) ? host_param('extra_packages').split(',') : []
-  preseed_extra_packages << "lsb-release"
-  preseed_extra_packages << "openssh-server"
-  preseed_extra_packages << "build-essential"
-  preseed_extra_packages << "vim"
-  preseed_extra_packages << "sed"
-  preseed_extra_packages << "xfsprogs"
-  preseed_extra_packages << "smartmontools"
-  preseed_extra_packages << "fio"
-  preseed_extra_packages << "stress"
-  preseed_extra_packages << "memtester"
-  preseed_extra_packages << "bc"
-  preseed_extra_packages << "apt-transport-https"
-  preseed_extra_packages << "megacli"
-  preseed_extra_packages << "lvm2"
-  preseed_extra_packages = preseed_extra_packages.join(' ')
 %>
 # Locale
 d-i debian-installer/locale string <%= host_param('lang') || 'en_US' %>
@@ -101,32 +84,42 @@ user-setup-udeb passwd/make-user boolean false
 <%   if aptly_host -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
+<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-updates-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %>-updates all
 d-i apt-setup/local<%= repos %>/source boolean false
+<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-security-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %>-security all
 d-i apt-setup/local<%= repos %>/source boolean false
+<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/rg-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
+<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/puppetlabs-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
+<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
+<% end -%>
 <% repos += 1 -%>
 <%   end -%>
 <% end -%>
 
 # Install minimal task set (see tasksel --task-packages minimal)
-tasksel tasksel/first multiselect minimal, ssh-server, openssh-server
+tasksel tasksel/first multiselect minimal, ssh-server
 
 # Install some base packages
-d-i pkgsel/include string <%= preseed_extra_packages %>
+d-i pkgsel/include string openssh-server apt-transport-https
 d-i pkgsel/update-policy select none
 d-i pkgsel/upgrade select none
 
