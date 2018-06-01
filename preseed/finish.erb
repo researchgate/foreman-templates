@@ -129,7 +129,7 @@ options timeout:1
 _EOF
 
 ## allow root login
-sed -i "s/^PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
+sed -i "s/^[#]*PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
 
 <% if @host.operatingsystem.name == 'Ubuntu' -%>
 # xenial workaround to override default options for grub to disable splash
