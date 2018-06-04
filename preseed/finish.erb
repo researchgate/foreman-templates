@@ -116,6 +116,7 @@ fi
 /usr/bin/puppet resource service puppet enable=true
 <%  end -%>
 <% end -%>
+<% end -%>
 
 <% if host_enc['parameters']['realm'] && @host.otp && @host.realm && @host.realm.realm_type == 'FreeIPA' -%>
 <%= snippet 'freeipa_register' %>
