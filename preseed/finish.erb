@@ -38,7 +38,7 @@ oses:
 exec 1>/bootstrap_finish.log
 <% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18 and host_param_true?('enable-puppet5')) -%>
 # Puppet repo
-echo 'deb http://aptly.ipbl.rgcloud.net/puppetnightly-bionic/ bionic all' > /etc/apt/sources.list.d/aptly-puppetnightly-bionic.list
+echo 'deb http://<%= aptly_host -%>/puppetnightly-bionic/ bionic all' > /etc/apt/sources.list.d/aptly-puppetnightly-bionic.list
 <% end -%>
 <% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18) -%>
 # bionic installer fix for apt-keys
