@@ -36,6 +36,10 @@ oses:
 %>
 
 exec 1>/bootstrap_finish.log
+<% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18 and host_param_true?('enable-puppet5')) -%>
+# Puppet repo
+echo 'deb http://aptly.ipbl.rgcloud.net/puppetnightly-bionic/ bionic all' > /etc/apt/sources.list.d/aptly-puppetnightly-bionic.list
+<% end -%>
 <% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18) -%>
 # bionic installer fix for apt-keys
 apt-get install -qy --no-install-recommends gnupg2
@@ -69,6 +73,20 @@ echo '/mnt/disk1_data/opt  /opt none bind,nofail 0 0' >> /etc/fstab
 # make sure puppetlabs dir exists if we use this as parent for ssl
 mkdir -p /etc/puppetlabs/puppet
 <% if host_param_true?('enable-puppet4') %>
+apt-get install -y puppet-agent
+cat > /etc/puppetlabs/puppet/puppet.conf << EOF
+<%= snippet 'puppet.conf' %>
+stringify_facts = false
+EOF
+if [ -f "/etc/default/puppet" ]
+then
+/bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
+fi
+/opt/puppetlabs/puppet/bin/puppet agent --enable
+/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/opt/puppetlabs/puppet/bin/puppet resource service puppet enable=true
+<% else -%>
+<% if host_param_true?('enable-puppet5') %>
 apt-get install -y puppet-agent
 cat > /etc/puppetlabs/puppet/puppet.conf << EOF
 <%= snippet 'puppet.conf' %>
