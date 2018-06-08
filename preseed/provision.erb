@@ -71,7 +71,11 @@ d-i clock-setup/ntp-server string <%= host_param('ntp-server') || '0.debian.pool
 <%= @host.diskLayout %>
 
 # Install different kernel
+<% if host_param('kernel-image') -%>
+d-i base-installer/kernel/image string <%= host_param('kernel-image') %>
+<% else -%>
 #d-i base-installer/kernel/image string linux-server
+<% end -%>
 
 # User settings
 d-i passwd/root-password-crypted password <%= root_pass %>

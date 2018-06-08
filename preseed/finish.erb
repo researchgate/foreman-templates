@@ -35,7 +35,7 @@ oses:
   preseed_extra_packages = preseed_extra_packages.join(' ')
 %>
 
-exec 1>/bootstrap_finish.log
+exec 1>/bootstrap_finish.log 2>&1
 <% if (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 18) -%>
 # bionic installer fix for apt-keys
 apt-get install -qy --no-install-recommends gnupg2
