@@ -84,35 +84,35 @@ d-i passwd passwd/make-user boolean false
 user-setup-udeb passwd/make-user boolean false
 
 <% repos = 0 %>
-<% if @host.operatingsystem.name == 'Ubuntu' -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/ -%>
 <%   if aptly_host -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
-<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-updates-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %>-updates all
 d-i apt-setup/local<%= repos %>/source boolean false
-<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/ubuntu-security-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %>-security all
 d-i apt-setup/local<%= repos %>/source boolean false
-<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/rg-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
-<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% end -%>
 <% repos += 1 -%>
 d-i apt-setup/local<%= repos %>/repository string http://<%= aptly_host -%>/puppetlabs-<%= @host.operatingsystem.release_name %>/ <%= @host.operatingsystem.release_name %> all
 d-i apt-setup/local<%= repos %>/source boolean false
-<% if @host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i < 18 -%>
+<% if @host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i < 18 -%>
 d-i apt-setup/local<%= repos %>/key string http://<%= aptly_host -%>/pubkey.pub
 <% end -%>
 <% repos += 1 -%>
@@ -142,7 +142,7 @@ d-i grub-installer/only_debian boolean true
 d-i grub-installer/with_other_os boolean true
 <% if host_param('install-disk') -%>
 d-i grub-installer/bootdev string <%= host_param('install-disk') %>
-<% elsif (@host.operatingsystem.name == 'Debian' and @host.operatingsystem.major.to_i >= 8) or (@host.operatingsystem.name == 'Ubuntu' and @host.operatingsystem.major.to_i >= 16) -%>
+<% elsif (@host.operatingsystem.name == 'Debian' and @host.operatingsystem.major.to_i >= 8) or (@host.operatingsystem.name =~ /^Ubuntu/  and @host.operatingsystem.major.to_i >= 16) -%>
 d-i grub-installer/bootdev string default
 <% end -%>
 
