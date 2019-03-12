@@ -157,6 +157,13 @@ nameserver <%= dns_server %>
 options rotate
 options timeout:1
 _EOF
+
+# Disable IPv6
+cat << _EOF >> /etc/sysctl.conf
+net.ipv6.conf.all.disable_ipv6 = 1
+net.ipv6.conf.default.disable_ipv6 = 1
+net.ipv6.conf.lo.disable_ipv6 = 1
+_EOF
 <% end -%>
 <% end -%>
 
