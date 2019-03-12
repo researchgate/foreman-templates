@@ -143,6 +143,23 @@ options rotate
 options timeout:1
 _EOF
 
+<% if @host.operatingsystem.name =~ /^Ubuntu/ -%>
+<% if @host.operatingsystem.major.to_i >= 17 -%>
+# Make sure systemd-resolved is fully disabled and not messing up resolvconf
+/bin/systemctl disable systemd-resolved.service
+/bin/systemctl stop systemd-resolved.service
+[ -f /etc/resolv.conf ] && rm /etc/resolv.conf
+cat << _EOF > /etc/resolv.conf
+domain <%= @host.domain %>
+<% [subnet.dns_primary,subnet.dns_secondary].reject{|n| n.blank?}.each do |dns_server| -%>
+nameserver <%= dns_server %>
+<% end -%>
+options rotate
+options timeout:1
+_EOF
+<% end -%>
+<% end -%>
+
 ## allow root login
 sed -i "s/^[#]*PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
 
