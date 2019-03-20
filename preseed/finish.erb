@@ -165,7 +165,7 @@ sed -i "s/^[#]*PermitRootLogin .*$/PermitRootLogin yes/g" /etc/ssh/sshd_config
 
 <% if @host.operatingsystem.name =~ /^Ubuntu/ -%>
 # xenial workaround to override default options for grub to disable splash
-sed 's/GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="nosplash net.ifnames=0 biosdevname=0 usbcore.autosuspend=-1 ipv6.disable=1"/g' -i /etc/default/grub && update-grub
+sed 's/GRUB_CMDLINE_LINUX_DEFAULT=".*"/GRUB_CMDLINE_LINUX_DEFAULT="nosplash net.ifnames=0 biosdevname=0 usbcore.autosuspend=-1"/g' -i /etc/default/grub && update-grub
 <% if @host.operatingsystem.major.to_i >= 15 -%>
 # fix puppet.service start issue on boot
 mkdir -p /etc/systemd/system/puppet.service.d
