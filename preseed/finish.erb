@@ -12,7 +12,6 @@ oses:
   salt_enabled = host_param('salt_master') ? true : false
   chef_enabled = @host.respond_to?(:chef_proxy) && @host.chef_proxy
   is_physical = (@host.facts['virtual'] == 'physical') ? true : false
-  burnin_enabled = host_param('burn-in') ? host_param('burn-in') : is_physical
   packages_host = host_param('packages_host') ? host_param('packages_host') : "packages.#{@host.domain}"
   aptly_host = (host_param('aptly_host') and not host_param('aptly_host').empty?) ? host_param('aptly_host') : "aptly.#{@host.domain}"
 
@@ -177,11 +176,6 @@ After=network-online.target
 EOF
 <% end -%>
 <% end -%>
-
-## prepare bootstrap and burn-in tool
-wget --no-parent -P /tmp/ http://<%= packages_host -%>/scripts/rg-burnin.sh
-echo "running rg-burnin.sh" >> /bootstrap.log 2>&1
-bash /tmp/rg-burnin.sh <%= packages_host %> <%= burnin_enabled -%> >> /bootstrap.log 2>&1 || /bin/true
 
 # Send finish to foreman
 /usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url('built') %>
