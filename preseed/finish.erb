@@ -78,7 +78,7 @@ then
 /bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
 fi
 /opt/puppetlabs/puppet/bin/puppet agent --enable
-/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log --verbose --debug --trace || /bin/true
 /opt/puppetlabs/puppet/bin/puppet resource service puppet enable=true
 <% else -%>
 <% if host_param_true?('enable-puppet5') %>
@@ -92,7 +92,7 @@ then
 /bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
 fi
 /opt/puppetlabs/puppet/bin/puppet agent --enable
-/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log --verbose --debug --trace || /bin/true
 /opt/puppetlabs/puppet/bin/puppet resource service puppet enable=true
 <% else -%>
 <%  if puppet_enabled %>
@@ -107,7 +107,7 @@ then
 fi
 /bin/touch /etc/puppet/namespaceauth.conf
 /usr/bin/puppet agent --enable
-/usr/bin/puppet agent --config /etc/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
+/usr/bin/puppet agent --config /etc/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log --verbose --debug --trace || /bin/true
 /usr/bin/puppet resource service puppet enable=true
 <%  end -%>
 <% end -%>
