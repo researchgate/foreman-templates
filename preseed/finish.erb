@@ -77,7 +77,7 @@ if [ -f "/etc/default/puppet" ]
 then
 /bin/sed -i 's/^START=no/START=yes/' /etc/default/puppet
 fi
-/opt/puppetlabs/puppet/bin/puppet agent --enable
+/opt/puppetlabs/puppet/bin/puppet agent --enable --verbose --debug --trace
 /opt/puppetlabs/puppet/bin/puppet agent --config /etc/puppetlabs/puppet/puppet.conf --detailed-exitcodes --onetime --configtimeout 300 --tags no_such_tag <%= @host.puppetmaster.blank? ? '' : "--server #{@host.puppetmaster}" %> --no-daemonize --logdest /var/log/puppet/puppet.log || /bin/true
 /opt/puppetlabs/puppet/bin/puppet resource service puppet enable=true
 <% else -%>
