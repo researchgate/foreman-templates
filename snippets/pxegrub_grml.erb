@@ -1,0 +1,10 @@
+<%#
+kind: snippet
+name: pxegrub_grml
+-%>
+<%
+  packages_host = host_param('packages_host') ? host_param('packages_host') : "packages.#{@host.domain}"
+%>
+title GRML
+  kernel grml/vmlinuz boot=live fetch=https://<%= packages_host -%>/grml/grml64-small.squashfs nodhcp noeject vga=791
+  initrd grml/initrd.img
