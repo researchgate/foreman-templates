@@ -1,6 +1,8 @@
 <%#
 kind: snippet
 name: pxegrub_grml
+model: ProvisioningTemplate
+snippet: true
 -%>
 <%
   packages_host = host_param('packages_host') ? host_param('packages_host') : "packages.#{@host.domain}"
