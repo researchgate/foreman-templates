@@ -179,7 +179,7 @@ EOF
 <% end -%>
 
 # Prepare RG bootstrap
-/usr/bin/wget --no-proxy --quiet --output-document=/root/rg-bootstrap.sh "https://${packages_host}/scripts/bootstrap/rg-bootstrap.sh"
+/usr/bin/wget --no-proxy --quiet --output-document=/root/rg-bootstrap.sh "https://<%= packages_host -%>/scripts/bootstrap/rg-bootstrap.sh"
 
 # Send finish to foreman
 /usr/bin/wget --no-proxy --quiet --output-document=/dev/null --no-check-certificate <%= foreman_url('built') %>
